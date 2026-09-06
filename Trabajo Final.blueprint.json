@@ -1,0 +1,321 @@
+{
+    "name": "Trabajo Final",
+    "flow": [
+        {
+            "id": 1,
+            "module": "notion:watchDatabaseItems",
+            "version": 1,
+            "parameters": {
+                "limit": 2,
+                "select": "update",
+                "watchBy": "database",
+                "database": "3b73c906597f80f0aceefa28587b9112",
+                "__IMTCONN__": 10330255
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 150
+                }
+            }
+        },
+        {
+            "id": 2,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 150
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 3,
+                            "module": "cohere:chat",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 10323739
+                            },
+                            "filter": {
+                                "name": "Estado es Generando",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.properties_value.Estado[].text.content}}",
+                                            "b": "Generando",
+                                            "o": "text:contain"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "p": "{{parseNumber(0.75)}}",
+                                "model": "command-r-08-2024",
+                                "message": "La Idea Semilla tiene este formato: 'PAIS: tema'. Idea Semilla completa: \"{{1.properties_value.`Idea Semilla`[].text.content}}\"\n\nEl texto ANTES de los dos puntos (:) es el PAIS OBLIGATORIO. Los 3 destinos que menciones DEBEN ser 3 ciudades o lugares reales que esten geograficamente DENTRO de ese pais. No menciones ningun lugar de otro pais bajo ninguna circunstancia.\n\nRedacta el CUERPO de un email con 3 opciones de destinos turisticos dentro de ese pais, conectando con el tema que viene despues de los dos puntos. Este email ES el canal de publicacion final (no es para redes sociales). IMPORTANTE: no incluyas ninguna linea de 'Asunto:' ni sugerencia de asunto, el email ya tiene su propio asunto por fuera - arranca directo con la introduccion. No uses formato Markdown (nada de ## para titulos ni - para listas), escribi todo en texto plano con parrafos separados por saltos de linea. Separa cada seccion (introduccion, cada destino, cierre) con un salto de linea doble para que se pueda leer facil. Estructura: introduccion breve, 3 opciones de destino (para cada una: nombre del destino, que lo hace especial, para que tipo de viajero es ideal, y un tip practico concreto), cierre con llamado a la accion suave.",
+                                "preamble": "Sos una agente de turismo experta que arma contenido para una comunidad de viajeros mochileros. Tu prioridad numero uno es la precision geografica: la Idea Semilla siempre tiene el formato 'PAIS: tema', y SOLO podes nombrar lugares reales dentro de ese pais especifico. Nunca mezcles destinos de otros paises. Actuas como asesora de viajes: tu objetivo es presentar opciones concretas de destinos alineadas al tema, con datos utiles y accionables. Segui estrictamente estas directrices de marca: TONO: cercano, inspirador, sin tecnicismos. PUBLICO: mochileros millennials/Gen Z con presupuesto ajustado. PROHIBIDO: imperdible, unico en su tipo, promesas exageradas, mencionar competencia, elegir destinos fuera del pais indicado, usar formato Markdown (##, -, **), incluir una linea de 'Asunto:' al principio. CTA estandar: Contanos tu experiencia en los comentarios. Hashtags: #ComunidadViajera #MochileroPorElMundo #ViajarConPresupuesto. No uses conocimiento externo de internet salvo el nombre y datos basicos de ciudades del pais indicado.",
+                                "max_tokens": "{{parseNumber(450)}}",
+                                "temperature": "{{parseNumber(0.2)}}",
+                                "response_format": {
+                                    "type": "text"
+                                },
+                                "search_queries_only": false
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 0
+                                },
+                                "expect": [
+                                    {
+                                        "name": "message",
+                                        "type": "text",
+                                        "label": "Message",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "model",
+                                        "type": "select",
+                                        "label": "Model"
+                                    },
+                                    {
+                                        "name": "max_tokens",
+                                        "type": "uinteger",
+                                        "label": "Max Tokens"
+                                    },
+                                    {
+                                        "name": "response_format",
+                                        "spec": [
+                                            {
+                                                "name": "type",
+                                                "type": "select",
+                                                "label": "Type",
+                                                "required": true,
+                                                "validate": {
+                                                    "enum": [
+                                                        "text",
+                                                        "json_object"
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Response Format"
+                                    },
+                                    {
+                                        "name": "preamble",
+                                        "type": "text",
+                                        "label": "Preamble"
+                                    },
+                                    {
+                                        "name": "temperature",
+                                        "type": "number",
+                                        "label": "Temperature",
+                                        "validate": {
+                                            "max": 1,
+                                            "min": 0
+                                        }
+                                    },
+                                    {
+                                        "name": "p",
+                                        "type": "number",
+                                        "label": "Top P",
+                                        "validate": {
+                                            "max": 0.99,
+                                            "min": 0.01
+                                        }
+                                    },
+                                    {
+                                        "name": "search_queries_only",
+                                        "type": "boolean",
+                                        "label": "Search Queries Only",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 4,
+                            "module": "notion:updateADatabaseItem",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 10330255
+                            },
+                            "mapper": {
+                                "page": "{{1.id}}",
+                                "fields": [
+                                    {
+                                        "key": "Contenido Generado",
+                                        "type": "rich_text",
+                                        "value": "{{substring(3.text; 0; 2000)}}"
+                                    },
+                                    {
+                                        "key": "Estado",
+                                        "type": "rich_text",
+                                        "value": "Pendiente de aprobacion"
+                                    },
+                                    {
+                                        "key": "Aprobado",
+                                        "type": "checkbox",
+                                        "value": false
+                                    }
+                                ],
+                                "select": "map",
+                                "updateBy": "data_source",
+                                "data_source": "3b73c906-597f-80d7-94bd-000b854aa677"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 0
+                                }
+                            }
+                        },
+                        {
+                            "id": 5,
+                            "module": "google-email:ActionSendEmail",
+                            "version": 1,
+                            "parameters": {
+                                "account": 10331440
+                            },
+                            "mapper": {
+                                "cc": [],
+                                "to": [
+                                    "barbarabengoa@gmail.com"
+                                ],
+                                "bcc": [],
+                                "from": "",
+                                "html": "Hay un nuevo borrador de email esperando tu aprobacion.<br><br><b>Idea Semilla:</b> {{1.properties_value.`Idea Semilla`[].text.content}}<br><br><b>Borrador:</b><br>{{replace(3.text; \"\n\"; \"<br>\")}}<br><br>Revisalo aca: {{1.url}}",
+                                "subject": "Borrador listo para aprobar: {{1.properties_value.`Idea Semilla`[].text.content}}",
+                                "attachments": []
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 6,
+                            "module": "notion:updateADatabaseItem",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 10330255
+                            },
+                            "filter": {
+                                "name": "Aprobado y no publicado todavia",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.properties_value.Aprobado}}",
+                                            "b": "true",
+                                            "o": "text:equal"
+                                        },
+                                        {
+                                            "a": "{{1.properties_value.Estado[].text.content}}",
+                                            "b": "Publicado",
+                                            "o": "text:notcontain"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "page": "{{1.id}}",
+                                "fields": [
+                                    {
+                                        "key": "Estado",
+                                        "type": "rich_text",
+                                        "value": "Publicado"
+                                    }
+                                ],
+                                "select": "map",
+                                "updateBy": "data_source",
+                                "data_source": "3b73c906-597f-80d7-94bd-000b854aa677"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 300
+                                }
+                            }
+                        },
+                        {
+                            "id": 7,
+                            "module": "notion:searchObjects1",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 10330255
+                            },
+                            "mapper": {
+                                "limit": 100,
+                                "select": "item",
+                                "database": "3d33c906597f80c79db3c475c853e59a"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 300
+                                }
+                            }
+                        },
+                        {
+                            "id": 8,
+                            "module": "google-email:ActionSendEmail",
+                            "version": 1,
+                            "parameters": {
+                                "account": 10331435
+                            },
+                            "mapper": {
+                                "cc": [],
+                                "to": [
+                                    "{{7.properties_value.`Correo electrónico`}}"
+                                ],
+                                "bcc": [],
+                                "from": "",
+                                "html": "Hola {{7.properties_value.Nombre[].text.content}}!<br><br>Te compartimos una nueva publicacion de la comunidad de viajeros:<br><br>{{replace(replace(replace(1.properties_value.`Contenido Generado`[].text.content; \"\n\"; \"<br>\"); \"**\"; \"\"); \"## \"; \"\")}}<br><br>Muchas gracias.<br>Saludos,<br>Equipo Turismo",
+                                "subject": "Nueva publicacion: {{1.properties_value.`Idea Semilla`[].text.content}}",
+                                "attachments": []
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 300
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": []
+    }
+}
